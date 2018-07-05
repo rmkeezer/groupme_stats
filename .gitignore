@@ -1,3 +1,6 @@
 .DS_Store
 *.csv
 *.pyc
+*.sqlite3*
+*.tsv
+*.json

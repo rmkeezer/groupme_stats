@@ -1,0 +1,1 @@
+curl -X POST "https://api.groupme.com/v3/bots/post?bot_id=1dfc618d351724d61d8585f9c4&text=This+is+a+test"
