@@ -37,22 +37,26 @@ class MyServer(BaseHTTPRequestHandler):
         print(content_length)
         print(post_data)
         data = json.loads(post_data.decode('utf8'))
-        if data['sender_type'] == "bot":
+        if 'fuchs' in data['name'].lower() or '!' in data['text'][:5]:
             self.send_response(200)
             return
-        if random.random() < 0.9 and "bjck" not in data['text'] and "OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!" not in data['text']:
+        trigs = ["bjck", "OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!".lower()]
+        if random.random() < 0.9 and all(x not in data['text'].lower() for x in trigs):
             self.send_response(200)
             return
         msg = chatbot.get_response(data['text'])
         msg = str(msg)
-        msg = '@' + data['name'] + ' ' + msg
+        resps = ["markov", "@"]
+        if all(x not in msg for x in resps):
+            msg = '@' + data['name'] + ' ' + msg
         print(msg)
         msg.replace(" ", "+")
+        print("START POST")
         response = requests.post(
-            url="https://api.groupme.com/v3/bots/post?bot_id=4081375711b06614af16500b07&text=" + msg)
+            url="https://api.groupme.com/v3/bots/post?bot_id=4081375711b06614af16500b07&text=" + msg, verify=False)
+        print("END POST")
         print(response.status_code, response.reason)
         self.send_response(200)
-
 
 myServer = HTTPServer((hostName, hostPort), MyServer)
 print(time.asctime(), "Server Starts - %s:%s" % (hostName, hostPort))
