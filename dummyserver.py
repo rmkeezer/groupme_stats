@@ -9,6 +9,9 @@ import json
 from chatterbot import ChatBot
 import requests
 
+import urllib.request
+from bs4 import BeautifulSoup
+
 import random
 
 target = "Christian Fuchs"
@@ -44,6 +47,23 @@ class MyServer(BaseHTTPRequestHandler):
         if random.random() < 0.9 and all(x not in data['text'].lower() for x in trigs):
             self.send_response(200)
             return
+        if "play " in data['text'].lower():
+            textToSearch = data['text'].lower().split("play")[1]
+            query = urllib.parse.quote(textToSearch)
+            url = "https://www.youtube.com/results?search_query=" + query
+            response = urllib.request.urlopen(url)
+            html = response.read()
+            soup = BeautifulSoup(html, 'html.parser')
+            msg = "No results"
+            for vid in soup.findAll(attrs={'class':'yt-uix-tile-link'}):
+                msg = 'https://www.youtube.com' + vid['href']
+                break
+            msg.replace(" ", "+")
+            print(msg)
+            response = requests.post(
+                url="https://api.groupme.com/v3/bots/post?bot_id=4081375711b06614af16500b07&text=" + msg, verify=False)
+            print(response.status_code, response.reason)
+            self.send_response(200)
         msg = chatbot.get_response(data['text'])
         msg = str(msg)
         resps = ["markov", "@"]
@@ -51,10 +71,8 @@ class MyServer(BaseHTTPRequestHandler):
             msg = '@' + data['name'] + ' ' + msg
         print(msg)
         msg.replace(" ", "+")
-        print("START POST")
         response = requests.post(
             url="https://api.groupme.com/v3/bots/post?bot_id=4081375711b06614af16500b07&text=" + msg, verify=False)
-        print("END POST")
         print(response.status_code, response.reason)
         self.send_response(200)
 
