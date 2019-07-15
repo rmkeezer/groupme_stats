@@ -64,6 +64,7 @@ class MyServer(BaseHTTPRequestHandler):
                 url="https://api.groupme.com/v3/bots/post?bot_id=4081375711b06614af16500b07&text=" + msg, verify=False)
             print(response.status_code, response.reason)
             self.send_response(200)
+            return
         msg = chatbot.get_response(data['text'])
         msg = str(msg)
         resps = ["markov", "@"]
