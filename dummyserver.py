@@ -56,6 +56,8 @@ class MyServer(BaseHTTPRequestHandler):
             soup = BeautifulSoup(html, 'html.parser')
             msg = "No results"
             for vid in soup.findAll(attrs={'class':'yt-uix-tile-link'}):
+                if 'googleadservices' in vid['href']:
+                    continue
                 msg = 'https://www.youtube.com' + vid['href']
                 break
             msg.replace(" ", "+")
